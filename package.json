@@ -2,6 +2,7 @@
     "name": "template-finder",
     "displayName": "template-finder",
     "description": "Find your templatized variables values easily",
+    "repository": "https://github.com/ArtyMaury/template-finder",
     "version": "0.0.1",
     "publisher": "artymaury",
     "engines": {
@@ -15,12 +16,26 @@
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+        "configuration": {
+            "properties": {
+                "templateFinder.variables.sourceFolders": {
+                    "type":"array",
+                    "default": [],
+                    "description": "List of folders containing de variables values in the workspace",
+                    "examples": [
+                        "referentiel-configuration/"
+                    ]
+                },
+                "templateFinder.variables.ignoredFolders": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Indicate folders to be ignored during the search for variables values",
+                    "examples": [
+                        "referentiel-configuration/ignoredFiles/"
+                    ]
+                }
             }
-        ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
+import * as path from 'path';
 
 const templateRegex = /{{(.+)}}/g;
 
@@ -23,8 +24,15 @@ export default {
         return templates;
     },
 
-    parseYamlForVariables: function(uri: vscode.Uri): object {
-        return yaml.safeLoad(fs.readFileSync(uri.fsPath, 'utf8'));
+    parseFileForVariables: function(uri: vscode.Uri): object {
+        let fileExtension = path.parse(uri.fsPath).ext;
+        switch (fileExtension) {
+            case '.yml':
+                return yaml.safeLoad(fs.readFileSync(uri.fsPath, 'utf8'));
+            
+            default:
+                return {};
+        }
     }
 };
 
@@ -38,7 +46,9 @@ export interface Template {
 function findTemplateInVariables(templateName: string, variables: any) {
     var results: any = {};
     Object.keys(variables).forEach(file => {
-        results[file] = variables[file][templateName];
+        if (variables[file][templateName] !== undefined) {
+            results[file] = variables[file][templateName];
+        }
     });
     return results;
 }

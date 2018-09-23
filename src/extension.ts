@@ -1,12 +1,24 @@
 import * as vscode from 'vscode';
 import Parser from './template_parser';
 import Decorator from './template_decorator';
+import FilesUtils from "./filesUtils";
 
 export function activate(context: vscode.ExtensionContext) {
 
     var variables: any = {};
 
-    //#region Initialisation of the extension
+    var workspaceConfig = vscode.workspace.getConfiguration("templateFinder");
+    vscode.workspace.onDidChangeConfiguration(() => {
+        workspaceConfig = vscode.workspace.getConfiguration("templateFinder");
+        updateAllVariables();
+    });
+
+    const variablesWatcher = FilesUtils.createVariablesWatcher(workspaceConfig);
+    variablesWatcher.onDidChange(uri => updateVariables(uri, variables, true));
+    variablesWatcher.onDidCreate(uri => updateVariables(uri, variables, true));
+    variablesWatcher.onDidDelete(uri => deleteVariables(uri, variables));
+
+    //#region Triggers à checker
 
     let activeEditor = vscode.window.activeTextEditor;
     if (activeEditor) {
@@ -25,6 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
             triggerUpdateTemplates();
         }
     }, null, context.subscriptions);
+    //#endregion
 
     var timeout: NodeJS.Timer;
     function triggerUpdateTemplates() {
@@ -33,16 +46,10 @@ export function activate(context: vscode.ExtensionContext) {
         }
         timeout = setTimeout(findTemplates, 1000);
 
-        vscode.workspace.findFiles("**/*.{yml}")
-            .then(uris => uris.forEach(uri => updateVariables(uri, variables)))
-            .then(() => findTemplates());
+        updateAllVariables();
+        findTemplates();
 
-        const yamlWatcher = vscode.workspace.createFileSystemWatcher("**/*.{yml}");
-        yamlWatcher.onDidChange(uri => updateVariables(uri, variables));
-        yamlWatcher.onDidCreate(uri => updateVariables(uri, variables));
-        yamlWatcher.onDidDelete(uri => variables[uri.fsPath] = {});
     }
-    //#endregion
 
     function findTemplates() {
         if (!activeEditor) {
@@ -52,19 +59,32 @@ export function activate(context: vscode.ExtensionContext) {
         Decorator.decorate(templates, activeEditor);
     }
 
-    function updateVariables(uri: vscode.Uri, variables: any) {
-        let filePath = (uri.fsPath);
-        let rootPath = vscode.workspace.rootPath;
-        if (rootPath !== undefined) {
-            let i;
-            for (i = 0; i < filePath.length; i++) {
-                if (filePath[i] !== rootPath[i]) {
-                    filePath = filePath.substring(i);
-                    break;
+    function updateAllVariables() {
+        FilesUtils.findVariablesFiles(workspaceConfig)
+            .then(uris => {
+                variables = {};
+                uris.forEach(uri => updateVariables(uri, variables));
+            });
+        findTemplates();
+    }
+
+    function updateVariables(uri: vscode.Uri, variables: any, checkFile = false) {
+        if (checkFile) {
+            FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
+                if (uris.some(uriFound => uri.path === uriFound.path)) {
+                    variables[FilesUtils.minimizePathFromWorkspace(uri)] = Parser.parseFileForVariables(uri);
+                } else {
+                    variables[FilesUtils.minimizePathFromWorkspace(uri)] = {};
                 }
-            }
+            });
+        } else {
+            variables[FilesUtils.minimizePathFromWorkspace(uri)] = Parser.parseFileForVariables(uri);
         }
-        variables[filePath] = Parser.parseYamlForVariables(uri);
+        return variables;
+    }
+
+    function deleteVariables(uri: vscode.Uri, variables: any) {
+        variables[FilesUtils.minimizePathFromWorkspace(uri)] = {};
         return variables;
     }
 }
