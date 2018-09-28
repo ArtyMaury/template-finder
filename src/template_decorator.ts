@@ -17,10 +17,16 @@ export default {
       const startPos = editor.document.positionAt(data.start);
       const endPos = editor.document.positionAt(data.end);
       let decoration;
-      if (Object.keys(data.variableMatches).length > 0) {
+      if (
+        maxMatch > 0 &&
+        (Object.keys(data.variableMatches).length > 0 || data.defaultValue)
+      ) {
         let hoverMessage = Object.keys(data.variableMatches).map(file => {
-          return file + ":\n" + data.variableMatches[file];
+          return file + " : " + data.variableMatches[file];
         });
+        if (data.defaultValue) {
+          hoverMessage.push("default : " + data.defaultValue);
+        }
         decoration = {
           range: new vscode.Range(startPos, endPos),
           hoverMessage: hoverMessage
