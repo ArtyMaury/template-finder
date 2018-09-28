@@ -19,7 +19,7 @@ export default {
             let i;
             for (i = 0; i < filePath.length; i++) {
                 if (filePath[i] !== rootPath[i]) {
-                    filePath = filePath.substring(i);
+                    filePath = filePath.substring(i+1);
                     break;
                 }
             }

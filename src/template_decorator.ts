@@ -21,12 +21,17 @@ export default {
         maxMatch > 0 &&
         (Object.keys(data.variableMatches).length > 0 || data.defaultValue)
       ) {
-        let hoverMessage = Object.keys(data.variableMatches).map(file => {
-          return file + " : " + data.variableMatches[file];
-        });
+        let hoverMessage = new vscode.MarkdownString(`Location | Value
+        :--- | ---:
+        `);
         if (data.defaultValue) {
-          hoverMessage.push("default : " + data.defaultValue);
+          hoverMessage.appendMarkdown("default | " + data.defaultValue + `
+          `);
         }
+        Object.keys(data.variableMatches).forEach(file => {
+          hoverMessage.appendMarkdown(file.replace(/\\/g, " / ") + " | " + data.variableMatches[file] + `
+          `);
+        });
         decoration = {
           range: new vscode.Range(startPos, endPos),
           hoverMessage: hoverMessage
