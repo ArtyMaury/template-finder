@@ -79,7 +79,6 @@ export function activate(context: vscode.ExtensionContext) {
       timeout = setTimeout(findTemplates, 1000);
 
       updateAllVariables();
-      findTemplates();
 
       variablesWatcher.onDidChange(uri =>
         updateVariables(uri, variables, true)
@@ -91,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
     } else {
       variablesWatcher.dispose();
       variables = {};
-      if (activeEditor) {
+      if (activeEditor && Decorator.initiated) {
         Decorator.clearAllDecorations(activeEditor);
       }
     }
@@ -114,28 +113,26 @@ export function activate(context: vscode.ExtensionContext) {
   function updateAllVariables() {
     FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
       variables = {};
-      uris.forEach(uri => updateVariables(uri, variables));
-    });
-    findTemplates();
+      return Promise.all(uris.map(uri => updateVariables(uri, variables)));
+    }).then(() => findTemplates());
   }
 
   function updateVariables(uri: vscode.Uri, variables: any, checkFile = false) {
     if (checkFile) {
       FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
         if (uris.some(uriFound => uri.path === uriFound.path)) {
-          variables[
-            FilesUtils.minimizePathFromWorkspace(uri)
-          ] = Parser.parseFileForVariables(uri);
+          return Parser.parseFileForVariables(uri).then(parsedVariables => {
+            variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+          });
         } else {
-          variables[FilesUtils.minimizePathFromWorkspace(uri)] = {};
+          return Promise.resolve(delete variables[FilesUtils.minimizePathFromWorkspace(uri)]);
         }
       });
     } else {
-      variables[
-        FilesUtils.minimizePathFromWorkspace(uri)
-      ] = Parser.parseFileForVariables(uri);
+      return Parser.parseFileForVariables(uri).then(parsedVariables => {
+        variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+      });
     }
-    return variables;
   }
 
   function deleteVariables(uri: vscode.Uri, variables: any) {

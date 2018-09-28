@@ -24,14 +24,14 @@ export default {
         return templates;
     },
 
-    parseFileForVariables: function(uri: vscode.Uri): object {
+    parseFileForVariables: function(uri: vscode.Uri): Promise<any> {
         let fileExtension = path.parse(uri.fsPath).ext;
         switch (fileExtension) {
             case '.yml':
-                return yaml.safeLoad(fs.readFileSync(uri.fsPath, 'utf8'));
+                return Promise.resolve(yaml.safeLoad(fs.readFileSync(uri.fsPath, 'utf8')));
             
             default:
-                return {};
+                return Promise.resolve();
         }
     }
 };
