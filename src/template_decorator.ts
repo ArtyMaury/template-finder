@@ -85,13 +85,13 @@ export default {
 };
 
 const allMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  backgroundColor: "rgba(0,255,0,0.15)"
+  color: "rgba(0,255,0,0.75)"
 };
 const someMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  backgroundColor: "rgba(255,140,0,0.15)"
+  color: "rgba(255,140,0,0.75)"
 };
 const noneMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  backgroundColor: "rgba(255,0,0,0.15)"
+  color: "rgba(255,0,0,0.9)"
 };
 
 var allMatchingTemplateDecorator: vscode.TextEditorDecorationType;
