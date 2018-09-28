@@ -33,9 +33,24 @@
                     "examples": [
                         "referentiel-configuration/ignoredFiles/"
                     ]
+                },
+                "templateFinder.extension.activated": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indicate wether the extension should scan for templates in this workspace"
                 }
             }
-        }
+        },
+        "commands": [
+            {
+                "command": "extension.activate",
+                "title": "Template-finder: Activate in this workspace"
+            },
+            {
+                "command": "extension.deactivate",
+                "title": "Template-finder: Deactivate in this workspace"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
