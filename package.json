@@ -1,16 +1,20 @@
 {
     "name": "template-finder",
-    "displayName": "template-finder",
+    "displayName": "Template Finder",
     "description": "Find your templatized variables values easily",
-    "repository": "https://github.com/ArtyMaury/template-finder",
-    "version": "0.0.1",
-    "publisher": "artymaury",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ArtyMaury/template-finder"
+    },
+    "version": "1.0.0",
+    "publisher": "Artymaury",
     "engines": {
         "vscode": "^1.27.0"
     },
     "categories": [
         "Other"
     ],
+    "keywords": ["template", "jinja", "ansible"],
     "activationEvents": [
         "*"
     ],
@@ -70,5 +74,6 @@
         "@types/js-yaml": "^3.11.2",
         "fs": "0.0.1-security",
         "js-yaml": "^3.12.0"
-    }
+    },
+    "icon": "icon.png"
 }

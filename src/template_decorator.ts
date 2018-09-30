@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { Template } from "./template_parser";
 
 export default {
-  decorate: function(decoratorsData: Template[], editor: vscode.TextEditor) {
+  decorate: function (decoratorsData: Template[], editor: vscode.TextEditor) {
     let noneMatchingDecorators: vscode.DecorationOptions[] = [];
     let allMatchingDecorators: vscode.DecorationOptions[] = [];
     let someMatchingDecorators: vscode.DecorationOptions[] = [];
@@ -21,9 +21,10 @@ export default {
         maxMatch > 0 &&
         (Object.keys(data.variableMatches).length > 0 || data.defaultValue)
       ) {
-        let hoverMessage = new vscode.MarkdownString(`Location | Value
-        :--- | ---:
-        `);
+        let hoverMessage = new vscode.MarkdownString(
+          `Location | Value
+          :--- | ---:
+          `);
         if (data.defaultValue) {
           hoverMessage.appendMarkdown("default | " + data.defaultValue + `
           `);
@@ -61,7 +62,7 @@ export default {
     );
   },
 
-  clearAllDecorations: function(editor: vscode.TextEditor) {
+  clearAllDecorations: function (editor: vscode.TextEditor) {
     allMatchingTemplateDecorator.dispose();
     someMatchingTemplateDecorator.dispose();
     noneMatchingTemplateDecorator.dispose();
@@ -70,7 +71,7 @@ export default {
 
   initiated: false,
 
-  init: function() {
+  init: function () {
     allMatchingTemplateDecorator = vscode.window.createTextEditorDecorationType(
       allMatchingTemplateDecorationRenderOptions
     );
