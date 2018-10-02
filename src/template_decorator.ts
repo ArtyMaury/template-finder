@@ -30,7 +30,8 @@ export default {
           `);
         }
         Object.keys(data.variableMatches).forEach(file => {
-          hoverMessage.appendMarkdown(file.replace(/\\/g, " / ") + " | " + data.variableMatches[file] + `
+          let location = file.replace(/\\/g, " / ");
+          hoverMessage.appendMarkdown(location + " | " + data.variableMatches[file] + `
           `);
         });
         decoration = {

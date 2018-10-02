@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export default {
 
-    findVariablesFiles: function(config: vscode.WorkspaceConfiguration) {
+    findVariablesFiles: function (config: vscode.WorkspaceConfiguration) {
         let glopPatternsVariables = getGlobPatternVariables(config);
         return vscode.workspace.findFiles(glopPatternsVariables.globPatternSource, glopPatternsVariables.globPatternIgnore);
     },
@@ -12,14 +12,14 @@ export default {
         return vscode.workspace.createFileSystemWatcher(glopPatternsVariables.globPatternSource);
     },
 
-    minimizePathFromWorkspace: function(uri: vscode.Uri) {
+    minimizePathFromWorkspace: function (uri: vscode.Uri) {
         let filePath = (uri.fsPath);
         let rootPath = vscode.workspace.rootPath;
         if (rootPath !== undefined) {
             let i;
             for (i = 0; i < filePath.length; i++) {
                 if (filePath[i] !== rootPath[i]) {
-                    filePath = filePath.substring(i+1);
+                    filePath = filePath.substring(i);
                     break;
                 }
             }
