@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/ArtyMaury/template-finder"
     },
-    "version": "1.0.0",
+    "version": "1.1.0",
     "publisher": "Artymaury",
     "engines": {
         "vscode": "^1.27.0"
@@ -14,7 +14,11 @@
     "categories": [
         "Other"
     ],
-    "keywords": ["template", "jinja", "ansible"],
+    "keywords": [
+        "template",
+        "jinja",
+        "ansible"
+    ],
     "activationEvents": [
         "*"
     ],
@@ -23,7 +27,7 @@
         "configuration": {
             "properties": {
                 "templateFinder.variables.sourceFolders": {
-                    "type":"array",
+                    "type": "array",
                     "default": [],
                     "description": "List of folders containing de variables values in the workspace",
                     "examples": [
