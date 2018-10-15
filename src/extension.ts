@@ -44,28 +44,34 @@ export function activate(context: vscode.ExtensionContext) {
 
   //#region activation command
 
-  let disposableActivationCommand = vscode.commands.registerCommand(
-    "extension.activate",
-    () => {
-      vscode.window.showInformationMessage(
-        "Template finder was activated here"
-      );
-      workspaceConfig.update("extension.activated", true);
-    }
-  );
 
-  let disposableDeactivationCommand = vscode.commands.registerCommand(
-    "extension.deactivate",
-    () => {
-      vscode.window.showInformationMessage(
-        "Template finder was deactivated here"
+  vscode.commands.getCommands().then(commands => {
+    if (commands.find(command => command === "extension.activate") === undefined) {
+      let disposableActivationCommand = vscode.commands.registerCommand(
+        "extension.activate",
+        () => {
+          vscode.window.showInformationMessage(
+            "Template finder was activated here"
+          );
+          workspaceConfig.update("extension.activated", true);
+        }
       );
-      workspaceConfig.update("extension.activated", false);
+      context.subscriptions.push(disposableActivationCommand);
     }
-  );
+    if (commands.find(command => command === "extension.deactivate") === undefined) {
+      let disposableDeactivationCommand = vscode.commands.registerCommand(
+        "extension.deactivate",
+        () => {
+          vscode.window.showInformationMessage(
+            "Template finder was deactivated here"
+          );
+          workspaceConfig.update("extension.activated", false);
+        }
+      );
+      context.subscriptions.push(disposableDeactivationCommand);
+    }
 
-  context.subscriptions.push(disposableActivationCommand);
-  context.subscriptions.push(disposableDeactivationCommand);
+  })
 
   //#endregion
 
@@ -104,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
       activeEditor.document.getText(),
       variables
     );
-    if(!Decorator.initiated) {
+    if (!Decorator.initiated) {
       Decorator.init();
     }
     Decorator.decorate(templates, activeEditor);
