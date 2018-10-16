@@ -51,9 +51,11 @@ export default {
     let fileExtension = path.parse(uri.fsPath).ext;
     switch (fileExtension) {
       case ".yml":
-        return Promise.resolve(
-          yaml.safeLoad(fs.readFileSync(uri.fsPath, "utf8"))
-        );
+        try {
+          return Promise.resolve(yaml.safeLoad(fs.readFileSync(uri.fsPath, 'utf8')));
+        } catch (e) {
+          return Promise.reject(e);
+        }
 
       default:
         return Promise.resolve();
