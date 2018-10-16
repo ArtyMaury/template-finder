@@ -113,10 +113,11 @@ export function activate(context: vscode.ExtensionContext) {
     if (!Decorator.initiated) {
       Decorator.init();
     }
-    Decorator.decorate(templates, activeEditor);
+    Decorator.decorate(templates, activeEditor, workspaceConfig);
   }
 
   function updateAllVariables() {
+    console.log("updating all variables")
     FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
       variables = {};
       return Promise.all(uris.map(uri => updateVariables(uri, variables)));

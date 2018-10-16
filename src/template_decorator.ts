@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { Template } from "./template_parser";
 
 export default {
-  decorate: function (decoratorsData: Template[], editor: vscode.TextEditor) {
+  decorate: function (decoratorsData: Template[], editor: vscode.TextEditor, config: vscode.WorkspaceConfiguration) {
     let noneMatchingDecorators: vscode.DecorationOptions[] = [];
     let allMatchingDecorators: vscode.DecorationOptions[] = [];
     let someMatchingDecorators: vscode.DecorationOptions[] = [];
@@ -13,6 +13,9 @@ export default {
       0
     );
 
+    const lineSeparator = config.get<Array<boolean>>("display.showLineSeparators") ? `| ${'-'.repeat(25)} |
+      ` : ""
+
     decoratorsData.forEach(data => {
       const startPos = editor.document.positionAt(data.start);
       const endPos = editor.document.positionAt(data.end);
@@ -22,16 +25,21 @@ export default {
         (Object.keys(data.variableMatches).length > 0 || data.defaultValue)
       ) {
         let hoverMessage = new vscode.MarkdownString(
-          `Location | Value
-          :--- | ---:
-          `);
+          `| ${'&nbsp;'.repeat(10)} Values ${'&nbsp;'.repeat(10)} |
+          | -------------------------- |
+          `
+        );
         if (data.defaultValue) {
-          hoverMessage.appendMarkdown("default | " + data.defaultValue + `
+          hoverMessage.appendMarkdown(
+            lineSeparator + `| **default** |
+          | ${data.defaultValue} |
           `);
         }
         Object.keys(data.variableMatches).forEach(file => {
           let location = file.replace(/\\/g, " / ");
-          hoverMessage.appendMarkdown(location + " | " + data.variableMatches[file] + `
+          hoverMessage.appendMarkdown(
+            lineSeparator + `| **${location}** |
+          | ${data.variableMatches[file]} |
           `);
         });
         decoration = {
