@@ -22,7 +22,7 @@ export default {
       let decoration;
       if (
         maxMatch > 0 &&
-        (Object.keys(data.variableMatches).length > 0 || data.defaultValue)
+        (Object.keys(data.variableMatches).length > 0 || data.defaultValue || data.objectMatch)
       ) {
         let hoverMessage = new vscode.MarkdownString(
           `| ${'&nbsp;'.repeat(10)} Values ${'&nbsp;'.repeat(10)} |
@@ -32,21 +32,27 @@ export default {
         if (data.defaultValue) {
           hoverMessage.appendMarkdown(
             lineSeparator + `| **default** |
-          | ${data.defaultValue} |
+          | ${beautifyValue(data.defaultValue)} |
+          `);
+        }
+        if (data.objectMatch) {
+          hoverMessage.appendMarkdown(
+            lineSeparator + `| **current file** |
+          | ${beautifyValue(data.objectMatch)} |
           `);
         }
         Object.keys(data.variableMatches).forEach(file => {
           let location = file.replace(/\\/g, " / ");
           hoverMessage.appendMarkdown(
             lineSeparator + `| **${location}** |
-          | ${data.variableMatches[file]} |
+          | ${beautifyValue(data.variableMatches[file])} |
           `);
         });
         decoration = {
           range: new vscode.Range(startPos, endPos),
           hoverMessage: hoverMessage
         };
-        if (Object.keys(data.variableMatches).length === maxMatch) {
+        if (Object.keys(data.variableMatches).length === maxMatch || data.objectMatch) {
           allMatchingDecorators.push(decoration);
         } else {
           someMatchingDecorators.push(decoration);
@@ -107,3 +113,21 @@ const noneMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOption
 var allMatchingTemplateDecorator: vscode.TextEditorDecorationType;
 var someMatchingTemplateDecorator: vscode.TextEditorDecorationType;
 var noneMatchingTemplateDecorator: vscode.TextEditorDecorationType;
+
+function beautifyValue(value: any, addedTab: number = 0, shouldAddLine:boolean = true): String {
+  const prefixFirst = shouldAddLine ? `
+  ${'&nbsp;'.repeat(addedTab * 2)}` : ""
+  const prefixValues = `
+  ${'&nbsp;'.repeat(addedTab * 2)}`
+  if (typeof value == "object") {
+    return Object.keys(value).map((key, index) => {
+      if (isNaN(Number.parseInt(key))) {
+        // Affichage d'un attribut de l'objet
+        return (index === 0 ? prefixFirst : prefixValues) + `${key} : ${beautifyValue(value[key], addedTab + 1)}`
+      }
+      // Affichages des elements d'un tableau
+      return prefixValues + `- ${beautifyValue(value[key], addedTab + 1, false)}`
+    }).reduce((p,c)=>p+c)
+  }
+  return value;
+}

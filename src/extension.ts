@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import Parser from "./template_parser";
+import Parser, {Template} from "./template_parser";
 import Decorator from "./template_decorator";
 import FilesUtils from "./filesUtils";
 
@@ -106,14 +106,32 @@ export function activate(context: vscode.ExtensionContext) {
     if (!activeEditor) {
       return;
     }
-    let templates = Parser.parseTextForTemplates(
-      activeEditor.document.getText(),
-      variables
-    );
-    if (!Decorator.initiated) {
-      Decorator.init();
+    let templates: Template[];
+    let currentDocumentObject: any;
+    if (activeEditor.document.languageId === "yaml") {
+      Parser.parseFileForVariables(activeEditor.document.uri).then(currentDocumentObject => {
+        templates = Parser.parseTextForTemplates(
+          //@ts-ignore: Null value not possible
+          activeEditor.document.getText(),
+          variables, currentDocumentObject
+        );
+        if (!Decorator.initiated) {
+          Decorator.init();
+        }
+          //@ts-ignore: Null value not possible
+        Decorator.decorate(templates, activeEditor, workspaceConfig);
+      })
+    } else {
+      templates = Parser.parseTextForTemplates(
+        activeEditor.document.getText(),
+        variables, currentDocumentObject
+      );
+      if (!Decorator.initiated) {
+        Decorator.init();
+      }
+      Decorator.decorate(templates, activeEditor, workspaceConfig);
     }
-    Decorator.decorate(templates, activeEditor, workspaceConfig);
+    
   }
 
   function updateAllVariables() {

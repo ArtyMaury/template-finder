@@ -12,15 +12,20 @@ const jinjaRegex = /{{ *([^ ]{1}[^\|\n ]*) *(?:\| *([^\|\n ]*) *)*}}/g;
 const defaultRegex = /default\((.+)\)/;
 
 export default {
-  parseTextForTemplates: function(
+  parseTextForTemplates: function (
     text: string,
-    variables: any
+    variables: any,
+    currentObject?: any
   ): Array<Template> {
     let templates: Array<Template> = new Array();
     let match;
     while ((match = jinjaRegex.exec(text))) {
       let templateName = match[1].trim();
       let variableMatches = findTemplateInVariables(templateName, variables);
+      let objectMatch;
+      if (currentObject) {
+        objectMatch = findTemplateInObject(templateName, currentObject);
+      }
       // To match the jinja templates options
       let defaultOption = match
         .slice(2)
@@ -39,6 +44,7 @@ export default {
         start: match.index,
         end: match.index + match[0].length,
         variableMatches: variableMatches,
+        objectMatch: objectMatch,
         defaultValue: defaultValue
       };
 
@@ -47,7 +53,7 @@ export default {
     return templates;
   },
 
-  parseFileForVariables: function(uri: vscode.Uri): Promise<any> {
+  parseFileForVariables: function (uri: vscode.Uri): Promise<any> {
     let fileExtension = path.parse(uri.fsPath).ext;
     switch (fileExtension) {
       case ".yml":
@@ -69,6 +75,7 @@ export interface Template {
   end: number;
   variableMatches: any;
   defaultValue: any;
+  objectMatch?: any;
 }
 
 function findTemplateInVariables(templateName: string, variables: any) {
@@ -79,4 +86,22 @@ function findTemplateInVariables(templateName: string, variables: any) {
     }
   });
   return results;
+}
+
+function findTemplateInObject(templateName: string, object: any) {
+  if (object === undefined) {
+    return null;
+  }
+  if (object[templateName] !== undefined) {
+    return object[templateName]
+  }
+  for (const key in object) {
+    if (typeof object[key] == "object") {
+      let foundTemplate: any = findTemplateInObject(templateName, object[key])
+      if (foundTemplate != null) {
+        return foundTemplate;
+      }
+    }
+  }
+  return null;
 }

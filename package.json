@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/ArtyMaury/template-finder"
     },
-    "version": "1.0.3",
+    "version": "1.0.4",
     "publisher": "Artymaury",
     "engines": {
         "vscode": "^1.0.0"
@@ -46,6 +46,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Indicate wether the extension should scan for templates in this workspace"
+                },
+                "templateFinder.display.showLineSeparators": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Indicate wether the variables values in the tooltip should be separated with dashes"
                 }
             }
         },

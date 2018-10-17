@@ -3,13 +3,14 @@ import * as vscode from 'vscode';
 export default {
 
     findVariablesFiles: function (config: vscode.WorkspaceConfiguration) {
-        let glopPatternsVariables = getGlobPatternVariables(config);
-        return vscode.workspace.findFiles(glopPatternsVariables.globPatternSource, glopPatternsVariables.globPatternIgnore);
+        let globPatternsVariables = getGlobPatternVariables(config);
+        const files = vscode.workspace.findFiles(globPatternsVariables.globPatternSource);
+        return files;
     },
 
     createVariablesWatcher: function (config: vscode.WorkspaceConfiguration) {
-        let glopPatternsVariables = getGlobPatternVariables(config);
-        return vscode.workspace.createFileSystemWatcher(glopPatternsVariables.globPatternSource);
+        let globPatternsVariables = getGlobPatternVariables(config);
+        return vscode.workspace.createFileSystemWatcher(globPatternsVariables.globPatternSource);
     },
 
     minimizePathFromWorkspace: function (uri: vscode.Uri) {
@@ -23,6 +24,9 @@ export default {
                     break;
                 }
             }
+        }
+        if (filePath.startsWith("\\")) {
+            filePath = filePath.substring(1)
         }
         return filePath;
     }

@@ -15,6 +15,8 @@ If not, please use [multi-root workspaces](https://code.visualstudio.com/docs/ed
 ### Activate
 
 Run the VSCode command `Template Finder: Activate in this workspace`
+<!-- 
+Waiting for the issue 
 
 ### Customize
 
@@ -29,7 +31,8 @@ If not you may want to use those settings:
 "templateFinder.variables.ignoredFolders": [
     "configuration/ignored"
 ]
-```
+``` -->
+
 
 
 
