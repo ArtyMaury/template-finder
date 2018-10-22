@@ -5,12 +5,13 @@ import FilesUtils from "./filesUtils";
 
 export function activate(context: vscode.ExtensionContext) {
   var variables: any = {};
+  var lastTemplateUpdateDate: number;
 
   var workspaceConfig = vscode.workspace.getConfiguration("templateFinder");
   vscode.workspace.onDidChangeConfiguration(() => {
     workspaceConfig = vscode.workspace.getConfiguration("templateFinder");
     if (workspaceConfig.get<Array<boolean>>("extension.activated")) {
-      updateAllVariables();
+      updateAll();
     }
   });
 
@@ -19,13 +20,13 @@ export function activate(context: vscode.ExtensionContext) {
   //#region editor triggers
   let activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
-    triggerUpdateTemplates();
+    triggerUpdate();
   }
   vscode.window.onDidChangeActiveTextEditor(
     editor => {
       activeEditor = editor;
       if (editor) {
-        triggerUpdateTemplates();
+        updateTemplates(true);
       }
     },
     null,
@@ -34,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidChangeTextDocument(
     event => {
       if (activeEditor && event.document === activeEditor.document) {
-        triggerUpdateTemplates();
+        updateTemplates();
       }
     },
     null,
@@ -75,22 +76,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   //#endregion
 
-  var timeout: NodeJS.Timer;
-  function triggerUpdateTemplates() {
+  function triggerUpdate() {
     // The extension only scans for templates if this config is true
-    if (timeout) {
-      clearTimeout(timeout);
-    }
     if (workspaceConfig.get<Array<boolean>>("extension.activated")) {
-      timeout = setTimeout(findTemplates, 1000);
 
-      updateAllVariables();
+      updateAll();
 
       variablesWatcher.onDidChange(uri =>
-        updateVariables(uri, variables, true)
+        updateVariablesFromFile(uri, variables, true)
       );
       variablesWatcher.onDidCreate(uri =>
-        updateVariables(uri, variables, true)
+        updateVariablesFromFile(uri, variables, true)
       );
       variablesWatcher.onDidDelete(uri => deleteVariables(uri, variables));
     } else {
@@ -102,10 +98,12 @@ export function activate(context: vscode.ExtensionContext) {
     }
   }
 
-  function findTemplates() {
-    if (!activeEditor) {
+  function updateTemplates(force = false) {
+    const currentDate = Date.now();
+    if (!activeEditor || (!force && lastTemplateUpdateDate != NaN &&  currentDate-lastTemplateUpdateDate < 500)) {
       return;
     }
+    lastTemplateUpdateDate = Date.now();
     let templates: Template[];
     let currentDocumentObject: any;
     if (activeEditor.document.languageId === "yaml") {
@@ -131,19 +129,21 @@ export function activate(context: vscode.ExtensionContext) {
       }
       Decorator.decorate(templates, activeEditor, workspaceConfig);
     }
-    
   }
 
-  function updateAllVariables() {
+  function updateAll() {
     console.log("updating all variables")
     FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
       variables = {};
-      return Promise.all(uris.map(uri => updateVariables(uri, variables)));
-    }).then(() => findTemplates());
+      return Promise.all(uris.map(uri => updateVariablesFromFile(uri, variables)));
+    })
+    .then(() => {
+      updateTemplates();
+    });
   }
 
-  function updateVariables(uri: vscode.Uri, variables: any, checkFile = false) {
-    if (checkFile) {
+  function updateVariablesFromFile(uri: vscode.Uri, variables: any, shouldCheckIfFileHasToBeUpdated = false) {
+    if (shouldCheckIfFileHasToBeUpdated) {
       FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
         if (uris.some(uriFound => uri.path === uriFound.path)) {
           return Parser.parseFileForVariables(uri).then(parsedVariables => {
