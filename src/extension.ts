@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidChangeConfiguration(() => {
     workspaceConfig = vscode.workspace.getConfiguration("templateFinder");
     if (workspaceConfig.get<Array<boolean>>("extension.activated")) {
-      updateAll();
+      triggerUpdate();
     }
   });
 
@@ -26,6 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     editor => {
       activeEditor = editor;
       if (editor) {
+
         updateTemplates(true);
       }
     },
@@ -35,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.workspace.onDidChangeTextDocument(
     event => {
       if (activeEditor && event.document === activeEditor.document) {
-        updateTemplates();
+        updateTemplates(true);
       }
     },
     null,
@@ -100,7 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   function updateTemplates(force = false) {
     const currentDate = Date.now();
-    if (!activeEditor || (!force && lastTemplateUpdateDate != NaN &&  currentDate-lastTemplateUpdateDate < 500)) {
+    if (!workspaceConfig.get<Array<boolean>>("extension.activated") || !activeEditor || (!force && !isNaN(lastTemplateUpdateDate) &&  currentDate-lastTemplateUpdateDate < 500)) {
       return;
     }
     lastTemplateUpdateDate = Date.now();
@@ -132,7 +133,6 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function updateAll() {
-    console.log("updating all variables")
     FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
       variables = {};
       return Promise.all(uris.map(uri => updateVariablesFromFile(uri, variables)));

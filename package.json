@@ -6,10 +6,10 @@
         "type": "git",
         "url": "https://github.com/ArtyMaury/template-finder"
     },
-    "version": "1.0.5",
+    "version": "1.0.6",
     "publisher": "Artymaury",
     "engines": {
-        "vscode": "^1.0.0"
+        "vscode": "^1.20.0"
     },
     "categories": [
         "Other"
@@ -73,16 +73,16 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.21",
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^8.10.36",
         "tslint": "^5.8.0",
-        "@types/node": "^8.10.25",
-        "@types/mocha": "^2.2.42"
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.21"
     },
     "dependencies": {
         "@types/js-yaml": "^3.11.2",
         "fs": "0.0.1-security",
         "js-yaml": "^3.12.0"
     },
-    "icon": "icon.png"
+    "icon": "assets/icon.png"
 }
