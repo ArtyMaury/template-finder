@@ -1,7 +1,12 @@
 # Change Log
+
 All notable changes to the "template-finder" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+
+## [1.1.3] - 2019-06-05
+
+- Added support for composed object in template (Ex: {{ toto.titi }})
 
 ## [1.1.2] - 2019-06-04
 

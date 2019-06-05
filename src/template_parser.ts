@@ -112,7 +112,7 @@ function findTemplateInVariables(templateName: string, variables: any) {
   Object.keys(variables).forEach(file => {
     if (
       !isNullOrUndefined(variables[file]) &&
-      isGoodObject(variables[file][templateName])
+      isGoodObject(variables[file], templateName)
     ) {
       results[file] = variables[file][templateName];
     }
@@ -124,8 +124,17 @@ function findTemplateInObject(templateName: string, object: any) {
   if (isNullOrUndefined(object)) {
     return undefined;
   }
-  if (isGoodObject(object[templateName])) {
-    return object[templateName];
+  if (isGoodObject(object, templateName)) {
+    if (templateName.includes('.')) {
+      let attributes = templateName.split('.');
+      let finalObject = object;
+      for (let attribute of attributes) {
+        finalObject = finalObject[attribute];
+      }
+      return finalObject;
+    } else {
+      return object[templateName];
+    }
   }
   for (const key in object) {
     if (typeof object[key] === 'object') {
@@ -138,7 +147,23 @@ function findTemplateInObject(templateName: string, object: any) {
   return undefined;
 }
 
-function isGoodObject(object: any) {
+function isGoodObject(object: any, attributeName?: string): boolean {
+  if (attributeName) {
+    if (attributeName.includes('.')) {
+      let attributes = attributeName.split('.');
+      let finalObject = object;
+      for (let attribute of attributes) {
+        if (!isNullOrUndefined(finalObject[attribute])) {
+          finalObject = finalObject[attribute];
+        } else {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return isGoodObject(object[attributeName]);
+    }
+  }
   return (
     !isNullOrUndefined(object) &&
     Object.keys(object).every(key => key !== '[object Object]')
