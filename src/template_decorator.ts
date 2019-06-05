@@ -1,18 +1,29 @@
 import * as vscode from 'vscode';
 import { Template } from './template_parser';
 
+var allMatchingTemplateDecorator: vscode.TextEditorDecorationType;
+var someMatchingTemplateDecorator: vscode.TextEditorDecorationType;
+var noneMatchingTemplateDecorator: vscode.TextEditorDecorationType;
+
 export default {
-  decorate: function(decoratorsData: Template[], editor: vscode.TextEditor, config: vscode.WorkspaceConfiguration) {
+  decorate: function(
+    decoratorsData: Template[],
+    editor: vscode.TextEditor,
+    config: vscode.WorkspaceConfiguration
+  ) {
     let noneMatchingDecorators: vscode.DecorationOptions[] = [];
     let allMatchingDecorators: vscode.DecorationOptions[] = [];
     let someMatchingDecorators: vscode.DecorationOptions[] = [];
 
     const maxMatch = decoratorsData.reduce(
-      (previous, current) => Math.max(previous, Object.keys(current.variableMatches).length),
+      (previous, current) =>
+        Math.max(previous, Object.keys(current.variableMatches).length),
       0
     );
 
-    const lineSeparator = config.get<Array<boolean>>('display.showLineSeparators')
+    const lineSeparator = config.get<Array<boolean>>(
+      'display.showLineSeparators'
+    )
       ? `| ${'-'.repeat(25)} |
       `
       : '';
@@ -21,13 +32,21 @@ export default {
       const startPos = editor.document.positionAt(data.start);
       const endPos = editor.document.positionAt(data.end);
       let decoration;
-      if (maxMatch > 0 && (Object.keys(data.variableMatches).length > 0 || data.defaultValue || data.objectMatch)) {
+      if (
+        maxMatch > 0 &&
+        (Object.keys(data.variableMatches).length > 0 ||
+          data.defaultValue ||
+          data.objectMatch)
+      ) {
         let hoverMessage = createHoverMessage(lineSeparator, data);
         decoration = {
           range: new vscode.Range(startPos, endPos),
           hoverMessage: hoverMessage
         };
-        if (Object.keys(data.variableMatches).length === maxMatch || data.objectMatch) {
+        if (
+          Object.keys(data.variableMatches).length === maxMatch ||
+          data.objectMatch
+        ) {
           allMatchingDecorators.push(decoration);
         } else {
           someMatchingDecorators.push(decoration);
@@ -42,8 +61,14 @@ export default {
     });
 
     editor.setDecorations(allMatchingTemplateDecorator, allMatchingDecorators);
-    editor.setDecorations(someMatchingTemplateDecorator, someMatchingDecorators);
-    editor.setDecorations(noneMatchingTemplateDecorator, noneMatchingDecorators);
+    editor.setDecorations(
+      someMatchingTemplateDecorator,
+      someMatchingDecorators
+    );
+    editor.setDecorations(
+      noneMatchingTemplateDecorator,
+      noneMatchingDecorators
+    );
   },
 
   clearAllDecorations: function(editor: vscode.TextEditor) {
@@ -79,10 +104,6 @@ const noneMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOption
   color: 'rgba(255,0,0,0.9)'
 };
 
-var allMatchingTemplateDecorator: vscode.TextEditorDecorationType;
-var someMatchingTemplateDecorator: vscode.TextEditorDecorationType;
-var noneMatchingTemplateDecorator: vscode.TextEditorDecorationType;
-
 function createHoverMessage(lineSeparator: string, data: Template) {
   let hoverMessage = new vscode.MarkdownString(
     `| ${'&nbsp;'.repeat(10)} Values ${'&nbsp;'.repeat(10)} |
@@ -92,7 +113,7 @@ function createHoverMessage(lineSeparator: string, data: Template) {
 
   if (data.unhandledJinjaOptions.length > 0) {
     hoverMessage.appendMarkdown(
-      `| ${data.unhandledJinjaOptions.join(' ; ')} |
+      `| ${data.unhandledJinjaOptions.join('\n')} |
           `
     );
   }
@@ -125,7 +146,11 @@ function createHoverMessage(lineSeparator: string, data: Template) {
   return hoverMessage;
 }
 
-function beautifyValue(value: any, addedTab: number = 0, shouldAddLine: boolean = true): String {
+function beautifyValue(
+  value: any,
+  addedTab: number = 0,
+  shouldAddLine: boolean = true
+): String {
   const prefixFirst = shouldAddLine
     ? `
   ${'&nbsp;'.repeat(addedTab * 2)}`
@@ -137,10 +162,15 @@ function beautifyValue(value: any, addedTab: number = 0, shouldAddLine: boolean 
       .map((key, index) => {
         if (isNaN(Number.parseInt(key))) {
           // Affichage d'un attribut de l'objet
-          return (index === 0 ? prefixFirst : prefixValues) + `${key} : ${beautifyValue(value[key], addedTab + 1)}`;
+          return (
+            (index === 0 ? prefixFirst : prefixValues) +
+            `${key} : ${beautifyValue(value[key], addedTab + 1)}`
+          );
         }
         // Affichages des elements d'un tableau
-        return prefixValues + `- ${beautifyValue(value[key], addedTab + 1, false)}`;
+        return (
+          prefixValues + `- ${beautifyValue(value[key], addedTab + 1, false)}`
+        );
       })
       .reduce((p, c) => p + c);
   }

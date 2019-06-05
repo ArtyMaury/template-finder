@@ -9,7 +9,11 @@ const jinjaRegex = /{{ *([^ ]{1}[^\|\n ]*) *\|* *(.*)}}/g;
 const defaultRegex = /default\((.+?)\)/;
 
 export default {
-  parseTextForTemplates: function(text: string, variables: any, currentObject?: any): Array<Template> {
+  parseTextForTemplates: function(
+    text: string,
+    variables: any,
+    currentObject?: any
+  ): Array<Template> {
     let templates: Array<Template> = new Array();
     let match;
     while ((match = jinjaRegex.exec(text))) {
@@ -21,12 +25,17 @@ export default {
       }
       // To match the jinja templates options
       let jinjaOptions = match[2].split('|').map(option => option.trim());
-      let defaultOption = jinjaOptions.find(
-        option => defaultRegex.test(option)
+      let defaultOption = jinjaOptions.find(option =>
+        defaultRegex.test(option)
       );
-      let unhandledJinjaOptions = jinjaOptions.filter(option => option !== defaultOption);
-      //@ts-ignore: Null value not possible
-      let defaultValue = defaultOption ? defaultRegex.exec(defaultOption.trim())[1] : undefined;
+      let unhandledJinjaOptions = jinjaOptions.filter(
+        option => option !== defaultOption
+      );
+      let defaultValue;
+      if (defaultOption) {
+        //@ts-ignore: Null value not possible
+        defaultValue = defaultRegex.exec(defaultOption)[1];
+      }
       const template: Template = {
         name: templateName,
         start: match.index,
@@ -42,38 +51,46 @@ export default {
     return templates;
   },
 
-  parseFileForVariables: function(uri: string, recursiveYaml: boolean = false): Promise<any> {
+  parseFileForVariables: function(
+    uri: string,
+    recursiveYaml: boolean = false
+  ): Promise<any> {
     let fileExtension = path.parse(uri).ext;
     let fileContent;
     switch (fileExtension) {
       case '.yml':
         try {
           fileContent = fs.readFileSync(uri, 'utf8');
-          return Promise.resolve(yaml.safeLoad(fileContent)).then(yamlObject => {
-            if (recursiveYaml) {
-              return this.extraireVarsFiles(yamlObject, uri).then(subYamlObjects => {
-                yamlObject.vars_files = subYamlObjects;
-                return yamlObject;
-              });
+          return Promise.resolve(yaml.safeLoad(fileContent)).then(
+            yamlObject => {
+              if (recursiveYaml) {
+                return this.extraireVarsFiles(yamlObject, uri).then(
+                  subYamlObjects => {
+                    yamlObject.vars_files = subYamlObjects;
+                    return yamlObject;
+                  }
+                );
+              }
+              return Promise.resolve(yamlObject);
             }
-            return Promise.resolve(yamlObject);
-          });
+          );
         } catch (e) {
-          console.error(e);
-          return Promise.resolve();
+          return Promise.resolve({});
         }
 
       default:
-        return Promise.resolve();
+        return Promise.resolve({});
     }
   },
 
   extraireVarsFiles: function(yamlObject: any, uri: string) {
     return Promise.all(
-      (findTemplateInObject('vars_files', yamlObject) as string[]).map(yamlFile => {
-        let uriNextFile = path.join(path.parse(uri).dir, yamlFile);
-        return this.parseFileForVariables(uriNextFile);
-      })
+      (findTemplateInObject('vars_files', yamlObject) as string[]).map(
+        yamlFile => {
+          let uriNextFile = path.join(path.parse(uri).dir, yamlFile);
+          return this.parseFileForVariables(uriNextFile);
+        }
+      )
     );
   }
 };
@@ -91,7 +108,11 @@ export interface Template {
 function findTemplateInVariables(templateName: string, variables: any) {
   var results: any = {};
   Object.keys(variables).forEach(file => {
-    if (variables[file][templateName] !== undefined && isGoodObject(variables[file][templateName])) {
+    if (
+      (variables[file] !== undefined && variables[file][templateName]) !==
+        undefined &&
+      isGoodObject(variables[file][templateName])
+    ) {
       results[file] = variables[file][templateName];
     }
   });
@@ -102,7 +123,10 @@ function findTemplateInObject(templateName: string, object: any) {
   if (object === undefined) {
     return undefined;
   }
-  if (object[templateName] !== undefined && isGoodObject(object[templateName])) {
+  if (
+    object[templateName] !== undefined &&
+    isGoodObject(object[templateName])
+  ) {
     return object[templateName];
   }
   for (const key in object) {
