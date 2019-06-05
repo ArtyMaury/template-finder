@@ -1,6 +1,7 @@
-import * as yaml from 'js-yaml';
 import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 import * as path from 'path';
+import { isNullOrUndefined } from 'util';
 
 // [^ ]{1} -> to match at least a character
 // [^\|\n ]* -> to match only the variable and not the options (like default)
@@ -63,7 +64,7 @@ export default {
           fileContent = fs.readFileSync(uri, 'utf8');
           return Promise.resolve(yaml.safeLoad(fileContent)).then(
             yamlObject => {
-              if (recursiveYaml) {
+              if (recursiveYaml && !isNullOrUndefined(yamlObject)) {
                 return this.extraireVarsFiles(yamlObject, uri).then(
                   subYamlObjects => {
                     yamlObject.vars_files = subYamlObjects;
@@ -84,14 +85,15 @@ export default {
   },
 
   extraireVarsFiles: function(yamlObject: any, uri: string) {
-    return Promise.all(
-      (findTemplateInObject('vars_files', yamlObject) as string[]).map(
-        yamlFile => {
-          let uriNextFile = path.join(path.parse(uri).dir, yamlFile);
-          return this.parseFileForVariables(uriNextFile);
-        }
-      )
-    );
+    let promises: Promise<any>[] = [];
+    let varsFiles = findTemplateInObject('vars_files', yamlObject);
+    if (!isNullOrUndefined(varsFiles)) {
+      promises = (varsFiles as string[]).map(yamlFile => {
+        let uriNextFile = path.join(path.parse(uri).dir, yamlFile);
+        return this.parseFileForVariables(uriNextFile);
+      });
+    }
+    return Promise.all(promises);
   }
 };
 
@@ -109,8 +111,7 @@ function findTemplateInVariables(templateName: string, variables: any) {
   var results: any = {};
   Object.keys(variables).forEach(file => {
     if (
-      (variables[file] !== undefined && variables[file][templateName]) !==
-        undefined &&
+      !isNullOrUndefined(variables[file]) &&
       isGoodObject(variables[file][templateName])
     ) {
       results[file] = variables[file][templateName];
@@ -120,13 +121,10 @@ function findTemplateInVariables(templateName: string, variables: any) {
 }
 
 function findTemplateInObject(templateName: string, object: any) {
-  if (object === undefined) {
+  if (isNullOrUndefined(object)) {
     return undefined;
   }
-  if (
-    object[templateName] !== undefined &&
-    isGoodObject(object[templateName])
-  ) {
+  if (isGoodObject(object[templateName])) {
     return object[templateName];
   }
   for (const key in object) {
@@ -141,8 +139,8 @@ function findTemplateInObject(templateName: string, object: any) {
 }
 
 function isGoodObject(object: any) {
-  if (!Object.keys(object).every(key => key !== '[object Object]')) {
-    console.trace(object);
-  }
-  return Object.keys(object).every(key => key !== '[object Object]');
+  return (
+    !isNullOrUndefined(object) &&
+    Object.keys(object).every(key => key !== '[object Object]')
+  );
 }

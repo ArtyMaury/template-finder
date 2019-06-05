@@ -6,6 +6,8 @@ The best use-case would be to have a folder with templated files, and other ones
 
 The templating format used is [Jinja](http://jinja.pocoo.org), used for example by [Ansible](https://ansible.com) playbooks.
 
+![example](./assets/example.gif)
+
 ## Getting started
 
 > **Important** <br>
