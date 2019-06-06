@@ -6,7 +6,7 @@ import { isNullOrUndefined } from 'util';
 // [^ ]{1} -> to match at least a character
 // [^\|\n ]* -> to match only the variable and not the options (like default)
 //  *\|* *(.*) -> to match the jinja templates options separated by |
-const jinjaRegex = /{{ *([^ ]{1}[^\|\n ]*) *\|* *(.*)}}/g;
+const jinjaRegex = /{{ *([^ ]{1}[^\|\n ]*) *\|* *(.*?)}}/g;
 const defaultRegex = /default\((.+?)\)/;
 
 export default {
