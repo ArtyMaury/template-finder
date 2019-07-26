@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from 'util';
 import * as vscode from 'vscode';
 import { Template } from './template_parser';
 
@@ -157,7 +158,10 @@ function beautifyValue(
     : '';
   const prefixValues = `
   ${'&nbsp;'.repeat(addedTab * 2)}`;
-  if (typeof value === 'object') {
+  if (!isNullOrUndefined(value) && typeof value === 'object') {
+    if (Object.keys(value).length === 0) {
+      return '[]';
+    }
     return Object.keys(value)
       .map((key, index) => {
         if (isNaN(Number.parseInt(key))) {

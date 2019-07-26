@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.1.6] - 2019-07-26
+
+- Fixed support for null object or empty arrays
+
 ## [1.1.3] - 2019-06-05
 
 - Added support for composed object in template (Ex: {{ toto.titi }})

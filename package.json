@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/ArtyMaury/template-finder"
   },
-  "version": "1.1.5",
+  "version": "1.1.6",
   "publisher": "Artymaury",
   "engines": {
     "vscode": "^1.20.0"
