@@ -6,14 +6,22 @@
     "type": "git",
     "url": "https://github.com/ArtyMaury/template-finder"
   },
-  "version": "1.1.6",
+  "version": "1.2.0",
   "publisher": "Artymaury",
   "engines": {
     "vscode": "^1.20.0"
   },
-  "categories": ["Other"],
-  "keywords": ["template", "jinja", "ansible"],
-  "activationEvents": ["*"],
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "template",
+    "jinja",
+    "ansible"
+  ],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension",
   "contributes": {
     "configuration": {
@@ -22,13 +30,17 @@
           "type": "array",
           "default": [],
           "description": "List of folders containing de variables values in the workspace",
-          "examples": ["referentiel-configuration/"]
+          "examples": [
+            "referentiel-configuration/"
+          ]
         },
         "templateFinder.variables.ignoredFolders": {
           "type": "array",
           "default": [],
           "description": "Indicate folders to be ignored during the search for variables values",
-          "examples": ["referentiel-configuration/ignoredFiles/"]
+          "examples": [
+            "referentiel-configuration/ignoredFiles/"
+          ]
         },
         "templateFinder.extension.activated": {
           "type": "boolean",
