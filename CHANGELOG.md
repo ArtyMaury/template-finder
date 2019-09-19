@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.1] - 2019-09-19
+
+- Fixed issue when yaml parsing returns null
+
 ## [1.2.0] - 2019-08-31
 
 - Added support for Jinja2 For loops
