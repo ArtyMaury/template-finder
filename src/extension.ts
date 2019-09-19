@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import Parser, { Template } from './template_parser';
 import Decorator from './template_decorator';
 import FilesUtils from './filesUtils';
+import { isNullOrUndefined } from 'util';
 
 export function activate(context: vscode.ExtensionContext) {
   var variables: any = {};
@@ -134,7 +135,9 @@ export function activate(context: vscode.ExtensionContext) {
       FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
         if (uris.some(uriFound => uri.path === uriFound.path)) {
           return Parser.parseFileForVariables(uri.fsPath).then(parsedVariables => {
-            variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+            if (!isNullOrUndefined(parsedVariables)) {
+              variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+            }
           });
         } else {
           return Promise.resolve(delete variables[FilesUtils.minimizePathFromWorkspace(uri)]);
