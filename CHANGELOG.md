@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.2] - 2019-09-19
+
+- Fixed list of undefined results if there is only one match
+
 ## [1.2.1] - 2019-09-19
 
 - Fixed issue when yaml parsing returns null
