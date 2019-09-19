@@ -80,6 +80,7 @@
     "vscode": "^1.1.36"
   },
   "dependencies": {
+    "@types/js-yaml": "^3.12.1",
     "fs": "0.0.1-security",
     "js-yaml": ">=3.13.1"
   },
