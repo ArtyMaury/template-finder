@@ -134,20 +134,22 @@ export function activate(context: vscode.ExtensionContext) {
     if (shouldCheckIfFileHasToBeUpdated) {
       FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
         if (uris.some(uriFound => uri.path === uriFound.path)) {
-          return Parser.parseFileForVariables(uri.fsPath).then(parsedVariables => {
-            if (!isNullOrUndefined(parsedVariables)) {
-              variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
-            }
-          });
+          return addVariablesFromFile(uri, variables);
         } else {
           return Promise.resolve(delete variables[FilesUtils.minimizePathFromWorkspace(uri)]);
         }
       });
     } else {
-      return Parser.parseFileForVariables(uri.fsPath).then(parsedVariables => {
-        variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
-      });
+      return addVariablesFromFile(uri, variables);
     }
+  }
+
+  function addVariablesFromFile(uri: vscode.Uri, variables: any) {
+    return Parser.parseFileForVariables(uri.fsPath).then(parsedVariables => {
+      if (!isNullOrUndefined(parsedVariables)) {
+        variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+      }
+    });
   }
 
   function deleteVariables(uri: vscode.Uri, variables: any) {
