@@ -3,30 +3,20 @@ import * as vscode from 'vscode';
 export default {
   findVariablesFiles: function(config: vscode.WorkspaceConfiguration) {
     let globPatternsVariables = getGlobPatternVariables(config);
-    const files = vscode.workspace.findFiles(
-      globPatternsVariables.globPatternSource
-    );
+    const files = vscode.workspace.findFiles(globPatternsVariables.globPatternSource);
     return files;
   },
 
   createVariablesWatcher: function(config: vscode.WorkspaceConfiguration) {
     let globPatternsVariables = getGlobPatternVariables(config);
-    return vscode.workspace.createFileSystemWatcher(
-      globPatternsVariables.globPatternSource
-    );
+    return vscode.workspace.createFileSystemWatcher(globPatternsVariables.globPatternSource);
   },
 
   minimizePathFromWorkspace: function(uri: vscode.Uri) {
     let filePath = uri.fsPath;
-    let rootPath = vscode.workspace.rootPath;
+    let rootPath = vscode.workspace.getWorkspaceFolder(uri);
     if (rootPath !== undefined) {
-      let i;
-      for (i = 0; i < filePath.length; i++) {
-        if (filePath[i] !== rootPath[i]) {
-          filePath = filePath.substring(i);
-          break;
-        }
-      }
+      filePath = filePath.split(rootPath.uri.fsPath)[1];
     }
     if (filePath.startsWith('\\')) {
       filePath = filePath.substring(1);

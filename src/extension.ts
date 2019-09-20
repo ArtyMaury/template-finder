@@ -136,7 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (uris.some(uriFound => uri.path === uriFound.path)) {
           return addVariablesFromFile(uri, variables);
         } else {
-          return Promise.resolve(delete variables[FilesUtils.minimizePathFromWorkspace(uri)]);
+          return Promise.resolve(deleteVariables(uri, variables));
         }
       });
     } else {
@@ -153,7 +153,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function deleteVariables(uri: vscode.Uri, variables: any) {
-    variables[FilesUtils.minimizePathFromWorkspace(uri)] = {};
+    delete variables[FilesUtils.minimizePathFromWorkspace(uri)];
     return variables;
   }
 }
