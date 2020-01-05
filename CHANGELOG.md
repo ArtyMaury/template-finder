@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.2.3] - 2020-01-05
+
+- Added support for `.yaml` files
+
 ## [1.2.2] - 2019-09-19
 
 - Fixed list of undefined results if there is only one match

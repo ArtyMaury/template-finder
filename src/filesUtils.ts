@@ -43,4 +43,4 @@ function getGlobPatternVariables(config: vscode.WorkspaceConfiguration) {
   };
 }
 
-const globPatternExtensions = '{yml}';
+const globPatternExtensions = '{yml,yaml}';

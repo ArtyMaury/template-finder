@@ -11,62 +11,40 @@ const jinjaForLoopRegex = /{% for (.+) in (.+) %}/g;
 const defaultRegex = /default\((.+?)\)/;
 
 export default {
-  parseTextForTemplates: function(
-    text: string,
-    variables: any,
-    currentObject?: any
-  ): Array<Template> {
+  parseTextForTemplates: function(text: string, variables: any, currentObject?: any): Array<Template> {
     const localVariables = JSON.parse(JSON.stringify(variables));
     let templates: Array<Template> = new Array();
     let match;
     while ((match = jinjaForLoopRegex.exec(text))) {
-      const template = createTemplateFromForLoopMatch(
-        match,
-        localVariables,
-        currentObject
-      );
+      const template = createTemplateFromForLoopMatch(match, localVariables, currentObject);
       templates.push(template);
     }
     while ((match = jinjaVariableRegex.exec(text))) {
-      const template = createTemplateFromVariableMatch(
-        match,
-        localVariables,
-        currentObject
-      );
+      const template = createTemplateFromVariableMatch(match, localVariables, currentObject);
       templates.push(template);
     }
     return templates;
   },
 
-  parseFileForVariables: function(
-    uri: string,
-    recursiveYaml: boolean = false
-  ): Promise<any> {
+  parseFileForVariables: function(uri: string, recursiveYaml: boolean = false): Promise<any> {
     let fileExtension = path.parse(uri).ext;
-    let fileContent;
-    switch (fileExtension) {
-      case '.yml':
-        try {
-          fileContent = fs.readFileSync(uri, 'utf8');
-          return Promise.resolve(yaml.safeLoad(fileContent)).then(
-            yamlObject => {
-              if (recursiveYaml && !isNullOrUndefined(yamlObject)) {
-                return this.extraireVarsFiles(yamlObject, uri).then(
-                  subYamlObjects => {
-                    yamlObject.vars_files = subYamlObjects;
-                    return yamlObject;
-                  }
-                );
-              }
-              return Promise.resolve(yamlObject);
-            }
-          );
-        } catch (e) {
-          return Promise.resolve({});
-        }
-
-      default:
+    if (/(\.ya?ml)/.test(fileExtension)) {
+      try {
+        let fileContent = fs.readFileSync(uri, 'utf8');
+        return Promise.resolve(yaml.safeLoad(fileContent)).then(yamlObject => {
+          if (recursiveYaml && !isNullOrUndefined(yamlObject)) {
+            return this.extraireVarsFiles(yamlObject, uri).then(subYamlObjects => {
+              yamlObject.vars_files = subYamlObjects;
+              return yamlObject;
+            });
+          }
+          return Promise.resolve(yamlObject);
+        });
+      } catch (e) {
         return Promise.resolve({});
+      }
+    } else {
+      return Promise.resolve({});
     }
   },
 
@@ -93,11 +71,7 @@ export interface Template {
   unhandledJinjaOptions: string[];
 }
 
-function createTemplateFromVariableMatch(
-  match: RegExpExecArray,
-  variables: any,
-  currentObject: any
-) {
+function createTemplateFromVariableMatch(match: RegExpExecArray, variables: any, currentObject: any) {
   let templateName = match[1].trim();
   let variableMatches = findTemplateInVariables(templateName, variables);
   let objectMatch;
@@ -107,9 +81,7 @@ function createTemplateFromVariableMatch(
   // To match the jinja templates options
   let jinjaOptions = match[2].split('|').map(option => option.trim());
   let defaultOption = jinjaOptions.find(option => defaultRegex.test(option));
-  let unhandledJinjaOptions = jinjaOptions.filter(
-    option => option !== defaultOption
-  );
+  let unhandledJinjaOptions = jinjaOptions.filter(option => option !== defaultOption);
   let defaultValue;
   if (defaultOption) {
     //@ts-ignore: Null value not possible
@@ -127,11 +99,7 @@ function createTemplateFromVariableMatch(
   return template;
 }
 
-function createTemplateFromForLoopMatch(
-  match: RegExpExecArray,
-  variables: any,
-  currentObject: any
-) {
+function createTemplateFromForLoopMatch(match: RegExpExecArray, variables: any, currentObject: any) {
   let variableName = match[1].trim();
   let listName = match[2].trim();
   let listeMatches = findTemplateInVariables(listName, variables);
@@ -149,10 +117,7 @@ function createTemplateFromForLoopMatch(
 function findTemplateInVariables(templateName: string, variables: any) {
   var results: any = {};
   for (const file in variables) {
-    const objectTemplateValue = getObjectAttributeValue(
-      variables[file],
-      templateName
-    );
+    const objectTemplateValue = getObjectAttributeValue(variables[file], templateName);
     if (objectTemplateValue) {
       results[file] = objectTemplateValue;
     }
@@ -168,10 +133,7 @@ function findTemplateInObject(templateName: string, object: any) {
     }
     for (const key in object) {
       if (typeof object[key] === 'object') {
-        let foundTemplate: any = findTemplateInObject(
-          templateName,
-          object[key]
-        );
+        let foundTemplate: any = findTemplateInObject(templateName, object[key]);
         if (foundTemplate) {
           return foundTemplate;
         }
@@ -181,19 +143,10 @@ function findTemplateInObject(templateName: string, object: any) {
   return;
 }
 
-function duplicateTemplateVariables(
-  variableName1: string,
-  variableName2: string,
-  variablesList: any
-) {
-  const variable1Matches = findTemplateInVariables(
-    variableName1,
-    variablesList
-  );
+function duplicateTemplateVariables(variableName1: string, variableName2: string, variablesList: any) {
+  const variable1Matches = findTemplateInVariables(variableName1, variablesList);
   for (const file in variable1Matches) {
-    variablesList[file][variableName2] = JSON.parse(
-      JSON.stringify(variablesList[file][variableName1])
-    );
+    variablesList[file][variableName2] = JSON.parse(JSON.stringify(variablesList[file][variableName1]));
   }
 }
 
@@ -206,10 +159,7 @@ function getObjectAttributeValue(object: any, attributeName?: string): any {
       return getObjectAttributeValue(object[attributeName]);
     }
   }
-  if (
-    !isNullOrUndefined(object) &&
-    Object.keys(object).every(key => key !== '[object Object]')
-  ) {
+  if (!isNullOrUndefined(object) && Object.keys(object).every(key => key !== '[object Object]')) {
     return object;
   }
   return;
@@ -223,17 +173,9 @@ function getObjectFinalAttribute(object: any, attributes: string[]): any {
     return;
   }
   if (isArray(object)) {
-    let listFinalItems = (object as Array<any>).map(item =>
-      getObjectFinalAttribute(item, attributes)
-    );
-    if (
-      listFinalItems.filter(
-        item => !!item && !JSON.stringify(item).includes('undefined')
-      ).length > 0
-    ) {
-      return listFinalItems.filter(
-        item => !!item && !JSON.stringify(item).includes('undefined')
-      );
+    let listFinalItems = (object as Array<any>).map(item => getObjectFinalAttribute(item, attributes));
+    if (listFinalItems.filter(item => !!item && !JSON.stringify(item).includes('undefined')).length > 0) {
+      return listFinalItems.filter(item => !!item && !JSON.stringify(item).includes('undefined'));
     }
   }
   return getObjectFinalAttribute(object[attributes[0]], attributes.slice(1));
