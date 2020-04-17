@@ -1,6 +1,7 @@
 import { isNullOrUndefined } from 'util';
 import * as vscode from 'vscode';
 import { Template } from './template_parser';
+import FilesUtils from './filesUtils';
 
 var allMatchingTemplateDecorator: vscode.TextEditorDecorationType;
 var someMatchingTemplateDecorator: vscode.TextEditorDecorationType;
@@ -133,16 +134,20 @@ function createHoverMessage(lineSeparator: string, data: Template) {
     }
 
     Object.keys(data.variableMatches).forEach((file) => {
-      let location = file.replace(/\\/g, ' / ');
+      let shortLocation = FilesUtils.minimizePathFromWorkspace(file);
+      let command = 'templateFinder.goto';
       hoverMessage.appendMarkdown(
         lineSeparator +
-          `| **${location}** |
+          `| **[${shortLocation}](command:${command}?${encodeURIComponent(
+            JSON.stringify({ file, key: data.name })
+          )} "Go To Definition")** |
             | ${beautifyValue(data.variableMatches[file])} |
             `
       );
     });
   }
 
+  hoverMessage.isTrusted = true;
   return hoverMessage;
 }
 
