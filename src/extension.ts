@@ -17,6 +17,17 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand('templateFinder.goto', (args) => {
+      const uri = vscode.Uri.parse(args.file);
+      FilesUtils.findInFile(uri, args.key).then((range) => {
+        vscode.window.showTextDocument(uri, {
+          selection: range,
+        });
+      });
+    })
+  );
+
   const variablesWatcher = FilesUtils.createVariablesWatcher(workspaceConfig);
 
   //#region editor triggers
@@ -148,13 +159,13 @@ export function activate(context: vscode.ExtensionContext) {
   function addVariablesFromFile(uri: vscode.Uri, variables: any) {
     return Parser.parseFileForVariables(uri.fsPath).then((parsedVariables) => {
       if (!isNullOrUndefined(parsedVariables)) {
-        variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
+        variables[uri.path] = parsedVariables;
       }
     });
   }
 
   function deleteVariables(uri: vscode.Uri, variables: any) {
-    delete variables[FilesUtils.minimizePathFromWorkspace(uri)];
+    delete variables[uri.path];
     return variables;
   }
 }

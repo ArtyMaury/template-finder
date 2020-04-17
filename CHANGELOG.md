@@ -2,6 +2,7 @@
 
 ## [1.3.0] - 2020-04-18
 
+- Added a link to the value définition
 - Added support for external variables (always shown as green)
 
 ## [1.2.3] - 2020-01-05
