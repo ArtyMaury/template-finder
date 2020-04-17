@@ -68,17 +68,16 @@
     "publish:token": "vsce publish -p"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.42",
-    "@types/node": "^8.10.54",
-    "tslint": "^5.20.0",
-    "typescript": "^2.6.1",
-    "vsce": "^1.66.0",
-    "vscode": "^1.1.36"
+    "@types/js-yaml": "^3.12.3",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^13.11.1",
+    "@types/vscode": "^1.44.0",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3",
+    "vsce": "^1.75.0"
   },
   "dependencies": {
-    "@types/js-yaml": "^3.12.1",
-    "fs": "0.0.1-security",
-    "js-yaml": ">=3.13.1"
+    "js-yaml": "^3.13.1"
   },
   "icon": "assets/icon.png"
 }
