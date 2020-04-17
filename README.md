@@ -21,23 +21,15 @@ The templating format used is [Jinja](http://jinja.pocoo.org), used for example 
 
 Run the VSCode command `Template Finder: Activate in this workspace`
 
-<!--
-Waiting for the issue
-
 ### Customize
 
-By default all yaml files in the workspace are considered as sources for variables values.
-
-If not you may want to use those settings:
+Sometimes variables are not defined in your workspace but by an external tool. For exemple an ansible extra-var passed in command-line. To avoid showing these variables as undefined, you can set:
 
 ```json
-"templateFinder.variables.sourceFolders": [
-    "configuration"
-],
-"templateFinder.variables.ignoredFolders": [
-    "configuration/ignored"
+"templateFinder.variables.externalVariables": [
+    "my_external_variable"
 ]
-``` -->
+```
 
 ## Issues
 

@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/ArtyMaury/template-finder"
   },
-  "version": "1.2.3",
+  "version": "1.3.0",
   "publisher": "Artymaury",
   "engines": {
     "vscode": "^1.20.0"
@@ -26,20 +26,12 @@
   "contributes": {
     "configuration": {
       "properties": {
-        "templateFinder.variables.sourceFolders": {
+        "templateFinder.variables.externalVariables": {
           "type": "array",
           "default": [],
-          "description": "List of folders containing de variables values in the workspace",
+          "description": "Indicate variables that should always be showed in green",
           "examples": [
-            "referentiel-configuration/"
-          ]
-        },
-        "templateFinder.variables.ignoredFolders": {
-          "type": "array",
-          "default": [],
-          "description": "Indicate folders to be ignored during the search for variables values",
-          "examples": [
-            "referentiel-configuration/ignoredFiles/"
+            "variable_not_set_in_workspace"
           ]
         },
         "templateFinder.extension.activated": {

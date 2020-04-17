@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.3.0] - 2020-04-18
+
+- Added support for external variables (always shown as green)
+
 ## [1.2.3] - 2020-01-05
 
 - Added support for `.yaml` files
