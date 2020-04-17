@@ -11,6 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   var workspaceConfig = vscode.workspace.getConfiguration('templateFinder');
   vscode.workspace.onDidChangeConfiguration(() => {
     workspaceConfig = vscode.workspace.getConfiguration('templateFinder');
+    console.log('settings changed');
     if (workspaceConfig.get<Array<boolean>>('extension.activated')) {
       triggerUpdate();
     }
@@ -24,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
     triggerUpdate();
   }
   vscode.window.onDidChangeActiveTextEditor(
-    editor => {
+    (editor) => {
       activeEditor = editor;
       if (editor) {
         updateTemplates(true);
@@ -34,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions
   );
   vscode.workspace.onDidChangeTextDocument(
-    event => {
+    (event) => {
       if (activeEditor && event.document === activeEditor.document) {
         updateTemplates(true);
       }
@@ -46,15 +47,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   //#region activation command
 
-  vscode.commands.getCommands().then(commands => {
-    if (commands.find(command => command === 'extension.activate') === undefined) {
+  vscode.commands.getCommands().then((commands) => {
+    if (commands.find((command) => command === 'extension.activate') === undefined) {
       let disposableActivationCommand = vscode.commands.registerCommand('extension.activate', () => {
         vscode.window.showInformationMessage('Template finder was activated here');
         workspaceConfig.update('extension.activated', true);
       });
       context.subscriptions.push(disposableActivationCommand);
     }
-    if (commands.find(command => command === 'extension.deactivate') === undefined) {
+    if (commands.find((command) => command === 'extension.deactivate') === undefined) {
       let disposableDeactivationCommand = vscode.commands.registerCommand('extension.deactivate', () => {
         vscode.window.showInformationMessage('Template finder was deactivated here');
         workspaceConfig.update('extension.activated', false);
@@ -70,9 +71,9 @@ export function activate(context: vscode.ExtensionContext) {
     if (workspaceConfig.get<Array<boolean>>('extension.activated')) {
       updateAll();
 
-      variablesWatcher.onDidChange(uri => updateVariablesFromFile(uri, variables, true));
-      variablesWatcher.onDidCreate(uri => updateVariablesFromFile(uri, variables, true));
-      variablesWatcher.onDidDelete(uri => deleteVariables(uri, variables));
+      variablesWatcher.onDidChange((uri) => updateVariablesFromFile(uri, variables, true));
+      variablesWatcher.onDidCreate((uri) => updateVariablesFromFile(uri, variables, true));
+      variablesWatcher.onDidDelete((uri) => deleteVariables(uri, variables));
     } else {
       variablesWatcher.dispose();
       variables = {};
@@ -95,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
     let templates: Template[];
     let currentDocumentObject: any;
     if (activeEditor.document.languageId === 'yaml') {
-      Parser.parseFileForVariables(activeEditor.document.uri.fsPath, true).then(currentDocumentObject => {
+      Parser.parseFileForVariables(activeEditor.document.uri.fsPath, true).then((currentDocumentObject) => {
         if (currentDocumentObject) {
           templates = Parser.parseTextForTemplates(
             //@ts-ignore: Null value not possible
@@ -121,9 +122,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   function updateAll() {
     FilesUtils.findVariablesFiles(workspaceConfig)
-      .then(uris => {
+      .then((uris) => {
         variables = {};
-        return Promise.all(uris.map(uri => updateVariablesFromFile(uri, variables)));
+        return Promise.all(uris.map((uri) => updateVariablesFromFile(uri, variables)));
       })
       .then(() => {
         updateTemplates();
@@ -132,8 +133,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   function updateVariablesFromFile(uri: vscode.Uri, variables: any, shouldCheckIfFileHasToBeUpdated = false) {
     if (shouldCheckIfFileHasToBeUpdated) {
-      FilesUtils.findVariablesFiles(workspaceConfig).then(uris => {
-        if (uris.some(uriFound => uri.path === uriFound.path)) {
+      FilesUtils.findVariablesFiles(workspaceConfig).then((uris) => {
+        if (uris.some((uriFound) => uri.path === uriFound.path)) {
           return addVariablesFromFile(uri, variables);
         } else {
           return Promise.resolve(deleteVariables(uri, variables));
@@ -145,7 +146,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   function addVariablesFromFile(uri: vscode.Uri, variables: any) {
-    return Parser.parseFileForVariables(uri.fsPath).then(parsedVariables => {
+    return Parser.parseFileForVariables(uri.fsPath).then((parsedVariables) => {
       if (!isNullOrUndefined(parsedVariables)) {
         variables[FilesUtils.minimizePathFromWorkspace(uri)] = parsedVariables;
       }

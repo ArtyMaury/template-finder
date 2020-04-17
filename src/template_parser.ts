@@ -11,7 +11,7 @@ const jinjaForLoopRegex = /{% for (.+) in (.+) %}/g;
 const defaultRegex = /default\((.+?)\)/;
 
 export default {
-  parseTextForTemplates: function(text: string, variables: any, currentObject?: any): Array<Template> {
+  parseTextForTemplates: function (text: string, variables: any, currentObject?: any): Array<Template> {
     const localVariables = JSON.parse(JSON.stringify(variables));
     let templates: Array<Template> = new Array();
     let match;
@@ -26,14 +26,14 @@ export default {
     return templates;
   },
 
-  parseFileForVariables: function(uri: string, recursiveYaml: boolean = false): Promise<any> {
+  parseFileForVariables: function (uri: string, recursiveYaml: boolean = false): Promise<any> {
     let fileExtension = path.parse(uri).ext;
     if (/(\.ya?ml)/.test(fileExtension)) {
       try {
         let fileContent = fs.readFileSync(uri, 'utf8');
-        return Promise.resolve(yaml.safeLoad(fileContent)).then(yamlObject => {
+        return Promise.resolve(yaml.safeLoad(fileContent)).then((yamlObject) => {
           if (recursiveYaml && !isNullOrUndefined(yamlObject)) {
-            return this.extraireVarsFiles(yamlObject, uri).then(subYamlObjects => {
+            return this.extraireVarsFiles(yamlObject, uri).then((subYamlObjects) => {
               yamlObject.vars_files = subYamlObjects;
               return yamlObject;
             });
@@ -48,17 +48,17 @@ export default {
     }
   },
 
-  extraireVarsFiles: function(yamlObject: any, uri: string) {
+  extraireVarsFiles: function (yamlObject: any, uri: string) {
     let promises: Promise<any>[] = [];
     let varsFiles = findTemplateInObject('vars_files', yamlObject);
     if (!isNullOrUndefined(varsFiles)) {
-      promises = (varsFiles as string[]).map(yamlFile => {
+      promises = (varsFiles as string[]).map((yamlFile) => {
         let uriNextFile = path.join(path.parse(uri).dir, yamlFile);
         return this.parseFileForVariables(uriNextFile);
       });
     }
     return Promise.all(promises);
-  }
+  },
 };
 
 export interface Template {
@@ -69,6 +69,7 @@ export interface Template {
   defaultValue?: any;
   objectMatch?: any;
   unhandledJinjaOptions: string[];
+  isExternal?: boolean;
 }
 
 function createTemplateFromVariableMatch(match: RegExpExecArray, variables: any, currentObject: any) {
@@ -79,9 +80,9 @@ function createTemplateFromVariableMatch(match: RegExpExecArray, variables: any,
     objectMatch = findTemplateInObject(templateName, currentObject);
   }
   // To match the jinja templates options
-  let jinjaOptions = match[2].split('|').map(option => option.trim());
-  let defaultOption = jinjaOptions.find(option => defaultRegex.test(option));
-  let unhandledJinjaOptions = jinjaOptions.filter(option => option !== defaultOption);
+  let jinjaOptions = match[2].split('|').map((option) => option.trim());
+  let defaultOption = jinjaOptions.find((option) => defaultRegex.test(option));
+  let unhandledJinjaOptions = jinjaOptions.filter((option) => option !== defaultOption);
   let defaultValue;
   if (defaultOption) {
     //@ts-ignore: Null value not possible
@@ -94,7 +95,7 @@ function createTemplateFromVariableMatch(match: RegExpExecArray, variables: any,
     variableMatches: variableMatches,
     objectMatch: objectMatch,
     defaultValue: defaultValue,
-    unhandledJinjaOptions: unhandledJinjaOptions
+    unhandledJinjaOptions: unhandledJinjaOptions,
   };
   return template;
 }
@@ -109,7 +110,7 @@ function createTemplateFromForLoopMatch(match: RegExpExecArray, variables: any, 
     start: match.index,
     end: match.index + match[0].length,
     variableMatches: listeMatches,
-    unhandledJinjaOptions: []
+    unhandledJinjaOptions: [],
   };
   return template;
 }
@@ -159,7 +160,7 @@ function getObjectAttributeValue(object: any, attributeName?: string): any {
       return getObjectAttributeValue(object[attributeName]);
     }
   }
-  if (!isNullOrUndefined(object) && Object.keys(object).every(key => key !== '[object Object]')) {
+  if (!isNullOrUndefined(object) && Object.keys(object).every((key) => key !== '[object Object]')) {
     return object;
   }
   return;
@@ -173,9 +174,9 @@ function getObjectFinalAttribute(object: any, attributes: string[]): any {
     return;
   }
   if (isArray(object)) {
-    let listFinalItems = (object as Array<any>).map(item => getObjectFinalAttribute(item, attributes));
-    if (listFinalItems.filter(item => !!item && !JSON.stringify(item).includes('undefined')).length > 0) {
-      return listFinalItems.filter(item => !!item && !JSON.stringify(item).includes('undefined'));
+    let listFinalItems = (object as Array<any>).map((item) => getObjectFinalAttribute(item, attributes));
+    if (listFinalItems.filter((item) => !!item && !JSON.stringify(item).includes('undefined')).length > 0) {
+      return listFinalItems.filter((item) => !!item && !JSON.stringify(item).includes('undefined'));
     }
   }
   return getObjectFinalAttribute(object[attributes[0]], attributes.slice(1));
