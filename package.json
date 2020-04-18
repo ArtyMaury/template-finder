@@ -29,7 +29,9 @@
       "properties": {
         "templateFinder.variables.externalVariables": {
           "type": "array",
-          "default": [],
+          "default": [
+            "ansible_env\\..*"
+          ],
           "description": "Indicate variables that should always be showed in green",
           "examples": [
             "variable_not_set_in_workspace"

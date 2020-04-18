@@ -27,6 +27,7 @@ Sometimes variables are not defined in your workspace but by an external tool. F
 
 ```json
 "templateFinder.variables.externalVariables": [
+    "ansible_env\\..*",
     "my_external_variable"
 ]
 ```
