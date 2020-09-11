@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.3.2] - 2020-09-11
+
+- Fixed render for VSCode 1.49 with new markdown renderer
+
+## [1.3.1] - 2020-04-18
+
+- Changed default value for external variables, added `ansible_env.*`
+
 ## [1.3.0] - 2020-04-18
 
 - Added a link to the value définition
