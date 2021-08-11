@@ -23,7 +23,7 @@ Run the VSCode command `Template Finder: Activate in this workspace`
 
 ### Customize
 
-Sometimes variables are not defined in your workspace but by an external tool. For exemple an ansible extra-var passed in command-line. To avoid showing these variables as undefined, you can set:
+Sometimes variables are not defined in your workspace but by an external tool. For example an ansible extra-var passed in command-line. To avoid showing these variables as undefined, you can set:
 
 ```json
 "templateFinder.variables.externalVariables": [
