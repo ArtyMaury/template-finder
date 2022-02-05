@@ -49,17 +49,20 @@
         },
         "templateFinder.display.colorAllMatching": {
           "type": "string",
-          "default": "rgba(0,255,0,0.75)",
+          "format": "color",
+          "default": "#00cf00",
           "description": "Variable highlight color if all match"
         },
         "templateFinder.display.colorSomeMatching": {
           "type": "string",
-          "default": "rgba(255,140,0,0.75)",
+          "format": "color",
+          "default": "#e77f00",
           "description": "Variable highlight color if some match"
         },
         "templateFinder.display.colorNoneMatching": {
           "type": "string",
-          "default": "rgba(255,0,0,0.9)",
+          "format": "color",
+          "default": "#ef0000",
           "description": "Variable highlight color if none match"
         }
       }
