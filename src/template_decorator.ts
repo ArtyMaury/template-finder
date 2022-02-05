@@ -73,6 +73,16 @@ export default {
   externalVariables: [] as Array<RegExp>,
 
   init: function () {
+    let allMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
+      color: vscode.workspace.getConfiguration('templateFinder.display').get('colorAllMatching'),
+    }
+    let someMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
+      color: vscode.workspace.getConfiguration('templateFinder.display').get('colorSomeMatching'),
+    }
+    let noneMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
+      color: vscode.workspace.getConfiguration('templateFinder.display').get('colorNoneMatching'),
+    }
+
     allMatchingTemplateDecorator = vscode.window.createTextEditorDecorationType(
       allMatchingTemplateDecorationRenderOptions
     )
@@ -84,16 +94,6 @@ export default {
     )
     this.initiated = true
   },
-}
-
-const allMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  color: 'rgba(0,255,0,0.75)',
-}
-const someMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  color: 'rgba(255,140,0,0.75)',
-}
-const noneMatchingTemplateDecorationRenderOptions: vscode.DecorationRenderOptions = {
-  color: 'rgba(255,0,0,0.9)',
 }
 
 function createHoverMessage(lineSeparator: string, data: Template) {
@@ -113,7 +113,7 @@ function createHoverMessage(lineSeparator: string, data: Template) {
   if (data.defaultValue) {
     hoverMessage.appendMarkdown(
       lineSeparator +
-        `| **default** |
+      `| **default** |
 | ${beautifyValue(data.defaultValue)} |
 `
     )
@@ -125,7 +125,7 @@ function createHoverMessage(lineSeparator: string, data: Template) {
     if (data.objectMatch) {
       hoverMessage.appendMarkdown(
         lineSeparator +
-          `| **current context** |
+        `| **current context** |
 | ${beautifyValue(data.objectMatch)} |
 `
       )
@@ -136,9 +136,9 @@ function createHoverMessage(lineSeparator: string, data: Template) {
       let command = 'templateFinder.goto'
       hoverMessage.appendMarkdown(
         lineSeparator +
-          `| **[${shortLocation}](command:${command}?${encodeURIComponent(
-            JSON.stringify({ file, key: data.name })
-          )} "Go To Definition")** |
+        `| **[${shortLocation}](command:${command}?${encodeURIComponent(
+          JSON.stringify({ file, key: data.name })
+        )} "Go To Definition")** |
 | ${beautifyValue(data.variableMatches[file])} |
 `
       )
