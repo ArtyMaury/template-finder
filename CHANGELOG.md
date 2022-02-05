@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.3.3] - 2022-02-05
+
+- Added settings to customize colors
+
 ## [1.3.2] - 2020-09-11
 
 - Fixed render for VSCode 1.49 with new markdown renderer
