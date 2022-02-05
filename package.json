@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/ArtyMaury/template-finder"
   },
-  "version": "1.3.2",
+  "version": "1.3.3",
   "publisher": "Artymaury",
   "license": "MIT",
   "engines": {
@@ -46,6 +46,24 @@
           "type": "boolean",
           "default": true,
           "description": "Indicate wether the variables values in the tooltip should be separated with dashes"
+        },
+        "templateFinder.display.colorAllMatching": {
+          "type": "string",
+          "format": "color",
+          "default": "#00cf00",
+          "description": "Variable highlight color if all match"
+        },
+        "templateFinder.display.colorSomeMatching": {
+          "type": "string",
+          "format": "color",
+          "default": "#e77f00",
+          "description": "Variable highlight color if some match"
+        },
+        "templateFinder.display.colorNoneMatching": {
+          "type": "string",
+          "format": "color",
+          "default": "#ef0000",
+          "description": "Variable highlight color if none match"
         }
       }
     },

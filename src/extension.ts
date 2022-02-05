@@ -14,6 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('settings changed');
     if (workspaceConfig.get<Array<boolean>>('extension.activated')) {
       triggerUpdate();
+      Decorator.init();
     }
   });
 
