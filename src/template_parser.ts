@@ -152,7 +152,7 @@ function findTemplateInObject(templateName: string, object: any) {
 function duplicateTemplateVariables(variableName1: string, variableName2: string, variablesList: any) {
   const variable1Matches = findTemplateInVariables(variableName1, variablesList)
   for (const file in variable1Matches) {
-    variablesList[file][variableName2] = JSON.parse(JSON.stringify(variablesList[file][variableName1]))
+    variablesList[file][variableName2] = JSON.parse(JSON.stringify(getObjectAttributeValue(variablesList[file], variableName1)))
   }
 }
 
