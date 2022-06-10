@@ -7,7 +7,7 @@ import { isArray, isNullOrUndefined } from 'util'
 // [^\|\n ]* -> to match only the variable and not the options (like default)
 //  *\|* *(.*) -> to match the jinja templates options separated by |
 const jinjaVariableRegex = /{{ *([^ ]{1}[^\|\n ]*) *\|* *(.*?)}}/g
-const jinjaForLoopRegex = /{% for (.+) in (.+) %}/g
+const jinjaForLoopRegex = /{% for (.+) in ([^%]+) %}/g
 const defaultRegex = /default\((.+?)\)/
 
 export default {
