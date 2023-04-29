@@ -94,7 +94,7 @@
     "@types/vscode": "^1.20.0",
     "tslint": "^6.1.1",
     "typescript": "^3.8.3",
-    "vsce": "^1.75.0"
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "js-yaml": "^3.13.1"
